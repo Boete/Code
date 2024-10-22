@@ -1,6 +1,19 @@
 import streamlit as st
 import math
 
+# Function to add custom CSS for buttons
+def set_button_style():
+    st.markdown("""
+    <style>
+    div.stButton > button {
+        width: 100%; 
+        height: 50px; 
+        font-size: 20px; 
+        margin: 10px 0;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # Function to calculate Ohm's law (Voltage, Current, Resistance)
 def calculate_ohms_law(v=None, i=None, r=None):
     if v is not None and i is not None:
@@ -93,10 +106,17 @@ def read_5_band_resistor(colors):
 # Streamlit App
 st.title("Electrical Calculator")
 
+# Apply custom button style
+set_button_style()
+
 # Buttons for navigation
-dc_mode = st.button("DC")
-ac_mode = st.button("AC")
-device_reader_mode = st.button("Device Reader")
+col1, col2, col3 = st.columns(3)
+with col1:
+    dc_mode = st.button("DC")
+with col2:
+    ac_mode = st.button("AC")
+with col3:
+    device_reader_mode = st.button("Device Reader")
 
 # DC Mode
 if dc_mode:
@@ -178,7 +198,7 @@ if ac_mode:
 
         if st.button("Calculate Impedance"):
             impedance = calculate_rlc_impedance(r, l, c, frequency)
-            st.success(f"Calculated RLC Impedance: {impedance} Ω")
+            st.success(f"RLC Impedance: {impedance} Ω")
 
     # 3-Phase Power Calculator
     elif calc_type == "3-Phase Power":
