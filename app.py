@@ -132,5 +132,4 @@ elif choice == "Device Reading":
             resistance = read_5_band_resistor([color1, color2, color3, color4])
             st.success(f"Calculated Resistance: {resistance} Ω")
 
-# To run this Streamlit app, save this code in a file called app.py and run the following command in your terminal:
-# streamlit run app.py
+
