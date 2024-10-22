@@ -93,12 +93,13 @@ def read_5_band_resistor(colors):
 # Streamlit App
 st.title("Electrical Calculator")
 
-# Sidebar for navigation
-menu = ["DC", "AC", "Device Reader"]
-choice = st.sidebar.selectbox("Select a calculator", menu)
+# Buttons for navigation
+dc_mode = st.button("DC")
+ac_mode = st.button("AC")
+device_reader_mode = st.button("Device Reader")
 
 # DC Mode
-if choice == "DC":
+if dc_mode:
     st.header("DC Calculators")
 
     calc_type = st.selectbox("Choose a DC calculation", ["Ohm's Law", "Series/Parallel Resistor", "Voltage/Current Divider"])
@@ -154,7 +155,7 @@ if choice == "DC":
                 st.success(f"Current through R2: {i2} A")
 
 # AC Mode
-elif choice == "AC":
+if ac_mode:
     st.header("AC Calculators")
 
     calc_type = st.selectbox("Choose an AC calculation", ["Vrms", "RLC Impedance", "3-Phase Power"])
@@ -191,7 +192,7 @@ elif choice == "AC":
             st.success(f"Calculated 3-Phase Power: {total_power} W")
 
 # Device Reader Mode with Resistor Reader
-elif choice == "Device Reader":
+if device_reader_mode:
     st.header("Device Reader")
     
     st.subheader("Resistor Reader (4-Band and 5-Band)")
