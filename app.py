@@ -135,41 +135,40 @@ if st.session_state.mode == 'DC':
 
     calc_type = st.selectbox("Choose a DC calculation", ["Ohm's Law", "Series/Parallel Resistor", "Voltage/Current Divider"])
     
+    # Result box for calculations
+    result_box = st.empty()
+    
     # Ohm's Law Calculator
     if calc_type == "Ohm's Law":
         v = st.number_input("Voltage (V)", value=0.0)
         i = st.number_input("Current (I)", value=0.0)
         r = st.number_input("Resistance (R)", value=0.0)
 
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if st.button("Calculate Ohm's Law"):
-                v, i, r = calculate_ohms_law(v if v > 0 else None, i if i > 0 else None, r if r > 0 else None)
-                st.success(f"Voltage = {v} V, Current = {i} A, Resistance = {r} Ω")
-        with col2:
-            st.text("Results")
+        if st.button("Calculate Ohm's Law"):
+            v, i, r = calculate_ohms_law(v if v > 0 else None, i if i > 0 else None, r if r > 0 else None)
+            result_box.success(f"Voltage = {v} V, Current = {i} A, Resistance = {r} Ω")
+        else:
+            result_box.text("Results will appear here.")
 
     # Series and Parallel Resistor Calculator
     elif calc_type == "Series/Parallel Resistor":
         calculation_type = st.selectbox("Select calculation type", ["Series", "Parallel"])
         resistances = st.text_input("Enter resistances (comma-separated, e.g., 10, 20, 30)")
         
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if st.button("Calculate Resistors"):
-                if resistances:
-                    try:
-                        res_list = [float(r) for r in resistances.split(',')]
-                        if calculation_type == "Series":
-                            series_res = calculate_series_resistance(res_list)
-                            st.success(f"Total Series Resistance: {series_res} Ω")
-                        elif calculation_type == "Parallel":
-                            parallel_res = calculate_parallel_resistance(res_list)
-                            st.success(f"Total Parallel Resistance: {parallel_res} Ω")
-                    except ValueError:
-                        st.error("Please enter valid resistor values.")
-        with col2:
-            st.text("Results")
+        if st.button("Calculate Resistors"):
+            if resistances:
+                try:
+                    res_list = [float(r) for r in resistances.split(',')]
+                    if calculation_type == "Series":
+                        series_res = calculate_series_resistance(res_list)
+                        result_box.success(f"Total Series Resistance: {series_res} Ω")
+                    elif calculation_type == "Parallel":
+                        parallel_res = calculate_parallel_resistance(res_list)
+                        result_box.success(f"Total Parallel Resistance: {parallel_res} Ω")
+                except ValueError:
+                    result_box.error("Please enter valid resistor values.")
+            else:
+                result_box.text("Results will appear here.")
 
     # Voltage/Current Divider Calculator
     elif calc_type == "Voltage/Current Divider":
@@ -180,27 +179,22 @@ if st.session_state.mode == 'DC':
             r1 = st.number_input("Enter R1", value=0.0)
             r2 = st.number_input("Enter R2", value=0.0)
 
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                if st.button("Calculate Voltage Divider"):
-                    vout = voltage_divider(vin, r1, r2)
-                    st.success(f"Output Voltage (Vout): {vout} V")
-            with col2:
-                st.text("Results")
+            if st.button("Calculate Voltage Divider"):
+                vout = voltage_divider(vin, r1, r2)
+                result_box.success(f"Output Voltage (Vout): {vout} V")
+            else:
+                result_box.text("Results will appear here.")
 
         elif divider_type == "Current Divider":
             itotal = st.number_input("Enter total current (Itotal)", value=0.0)
             r1 = st.number_input("Enter R1", value=0.0)
             r2 = st.number_input("Enter R2", value=0.0)
 
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                if st.button("Calculate Current Divider"):
-                    i1, i2 = current_divider(itotal, r1, r2)
-                    st.success(f"Current through R1: {i1} A")
-                    st.success(f"Current through R2: {i2} A")
-            with col2:
-                st.text("Results")
+            if st.button("Calculate Current Divider"):
+                i1, i2 = current_divider(itotal, r1, r2)
+                result_box.success(f"Current through R1: {i1} A, Current through R2: {i2} A")
+            else:
+                result_box.text("Results will appear here.")
 
 # AC Mode
 elif st.session_state.mode == 'AC':
@@ -208,18 +202,19 @@ elif st.session_state.mode == 'AC':
 
     calc_type = st.selectbox("Choose an AC calculation", ["Vrms", "RLC Impedance", "3-Phase Power"])
 
+    # Result box for AC calculations
+    result_box = st.empty()
+
     # Vrms Calculator
     if calc_type == "Vrms":
         peak_voltage = st.number_input("Peak Voltage (Vpeak)", value=0.0)
         waveform_type = st.selectbox("Select Waveform Type", options=["sine", "square", "triangle", "sawtooth", "half-wave rectified", "full-wave rectified"])
 
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if st.button("Calculate RMS Voltage"):
-                rms_voltage = calculate_rms_voltage(peak_voltage, waveform_type)
-                st.success(f"Calculated RMS Voltage for {waveform_type} wave: {rms_voltage} V")
-        with col2:
-            st.text("Results")
+        if st.button("Calculate RMS Voltage"):
+            rms_voltage = calculate_rms_voltage(peak_voltage, waveform_type)
+            result_box.success(f"Calculated RMS Voltage for {waveform_type} wave: {rms_voltage} V")
+        else:
+            result_box.text("Results will appear here.")
 
     # RLC Impedance Calculator
     elif calc_type == "RLC Impedance":
@@ -228,13 +223,11 @@ elif st.session_state.mode == 'AC':
         c = st.number_input("Capacitance (C in Farad)", value=0.0)
         frequency = st.number_input("Frequency (Hz)", value=0.0)
 
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if st.button("Calculate RLC Impedance"):
-                impedance = calculate_rlc_impedance(r, l, c, frequency)
-                st.success(f"RLC Impedance: {impedance} Ω")
-        with col2:
-            st.text("Results")
+        if st.button("Calculate RLC Impedance"):
+            impedance = calculate_rlc_impedance(r, l, c, frequency)
+            result_box.success(f"RLC Impedance: {impedance} Ω")
+        else:
+            result_box.text("Results will appear here.")
 
     # 3-Phase Power Calculator
     elif calc_type == "3-Phase Power":
@@ -243,13 +236,11 @@ elif st.session_state.mode == 'AC':
         power_factor = st.number_input("Power Factor (0-1)", value=1.0)
         connection_type = st.selectbox("Connection Type", options=["Y", "Delta"])
 
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if st.button("Calculate 3-Phase Power"):
-                total_power = three_phase_power(v_phase, i_phase, power_factor, connection_type)
-                st.success(f"Calculated 3-Phase Power: {total_power} W")
-        with col2:
-            st.text("Results")
+        if st.button("Calculate 3-Phase Power"):
+            total_power = three_phase_power(v_phase, i_phase, power_factor, connection_type)
+            result_box.success(f"Calculated 3-Phase Power: {total_power} W")
+        else:
+            result_box.text("Results will appear here.")
 
 # Device Reader Mode with Resistor Reader
 elif st.session_state.mode == 'Device Reader':
@@ -258,28 +249,31 @@ elif st.session_state.mode == 'Device Reader':
     st.subheader("Resistor Reader (4-Band and 5-Band)")
     resistor_type = st.selectbox("Select Resistor Type", options=["4-Band", "5-Band"])
 
+    # Result box for resistor reading
+    result_box = st.empty()
+
     if resistor_type == "4-Band":
         colors = st.text_input("Enter 4 colors (comma-separated, e.g., red, green, blue, gold)").split(",")
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if len(colors) == 4 and st.button("Calculate Resistance"):
+        
+        if st.button("Calculate Resistance"):
+            if len(colors) == 4:
                 try:
                     resistance = read_4_band_resistor(colors)
-                    st.success(f"4-Band Resistor Value: {resistance} Ω")
+                    result_box.success(f"4-Band Resistor Value: {resistance} Ω")
                 except KeyError:
-                    st.error("Invalid color entered. Please enter valid resistor colors.")
-        with col2:
-            st.text("Results")
+                    result_box.error("Invalid color entered. Please enter valid resistor colors.")
+            else:
+                result_box.text("Results will appear here.")
     
     elif resistor_type == "5-Band":
         colors = st.text_input("Enter 5 colors (comma-separated, e.g., red, green, blue, orange, gold)").split(",")
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if len(colors) == 5 and st.button("Calculate Resistance"):
+        
+        if st.button("Calculate Resistance"):
+            if len(colors) == 5:
                 try:
                     resistance = read_5_band_resistor(colors)
-                    st.success(f"5-Band Resistor Value: {resistance} Ω")
+                    result_box.success(f"5-Band Resistor Value: {resistance} Ω")
                 except KeyError:
-                    st.error("Invalid color entered. Please enter valid resistor colors.")
-        with col2:
-            st.text("Results")
+                    result_box.error("Invalid color entered. Please enter valid resistor colors.")
+            else:
+                result_box.text("Results will appear here.")
