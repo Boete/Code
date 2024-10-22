@@ -110,7 +110,45 @@ def read_5_band_resistor(colors):
     multiplier = 10 ** color_codes[colors[3].lower()]
     resistance = (first_digit * 100 + second_digit * 10 + third_digit) * multiplier
     return resistance
+# Function to get user location
+def get_user_location():
+    # HTML and JavaScript code to get user location
+    location_js = """
+    <script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+        }
+    }
 
+    function showPosition(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+        // Send the location to Streamlit via a callback
+        const message = { lat: lat, lon: lon };
+        window.parent.document.getElementById('lat_lon').value = JSON.stringify(message);
+        document.getElementById("location").innerHTML = "Location retrieved.";
+    }
+    </script>
+    <button onclick="getLocation()">Get Location</button>
+    <div id="location"></div>
+    """
+    return location_js
+
+# Streamlit App
+st.title("User Location Collector")
+
+# Display the HTML for getting user location
+st.markdown(get_user_location(), unsafe_allow_html=True)
+
+# Hidden input to hold the location data
+location_data = st.text_input("Location Data", "", key='lat_lon')
+
+if location_data:
+    location = st.session_state.lat_lon
+    st.success(f"User's Location: {location}")
 # Streamlit App
 st.title("Electrical Calculator")
 
