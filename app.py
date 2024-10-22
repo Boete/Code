@@ -131,5 +131,5 @@ elif choice == "Device Reading":
         if st.button("Calculate Resistance"):
             resistance = read_5_band_resistor([color1, color2, color3, color4])
             st.success(f"Calculated Resistance: {resistance} Ω")
-
+ #gjkyhgj
 
