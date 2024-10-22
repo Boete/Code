@@ -206,4 +206,38 @@ elif st.session_state.mode == 'AC':
         waveform_type = st.selectbox("Select Waveform Type", options=["sine", "square", "triangle", "sawtooth", "half-wave rectified", "full-wave rectified"])
 
         if st.button("Calculate RMS Voltage"):
-            rms_voltage = calculate_r
+            rms_voltage = calculate_rms_voltage(peak_voltage, waveform_type)
+            result_box.success(f"RMS Voltage: {rms_voltage} V")
+        else:
+            result_box.text("Results will appear here.")
+
+    # RLC Impedance Calculator
+    elif calc_type == "RLC Impedance":
+        r = st.number_input("Resistance (R)", value=0.0)
+        l = st.number_input("Inductance (L)", value=0.0)
+        c = st.number_input("Capacitance (C)", value=0.0)
+        frequency = st.number_input("Frequency (Hz)", value=0.0)
+
+        if st.button("Calculate Impedance"):
+            impedance = calculate_rlc_impedance(r, l, c, frequency)
+            result_box.success(f"Impedance: {impedance} Ω")
+        else:
+            result_box.text("Results will appear here.")
+
+    # 3-Phase Power Calculator
+    elif calc_type == "3-Phase Power":
+        v_phase = st.number_input("Phase Voltage (V)", value=0.0)
+        i_phase = st.number_input("Phase Current (I)", value=0.0)
+        power_factor = st.number_input("Power Factor", value=1.0)
+        connection_type = st.selectbox("Connection Type", ["Y", "Delta"])
+
+        if st.button("Calculate Power"):
+            power = three_phase_power(v_phase, i_phase, power_factor, connection_type)
+            result_box.success(f"Total Power: {power} W")
+        else:
+            result_box.text("Results will appear here.")
+
+# Device Reader Mode (can be filled as needed)
+elif st.session_state.mode == 'Device Reader':
+    st.header("Device Reader")
+    # Additional device reader functionalities can be added here
