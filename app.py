@@ -129,15 +129,15 @@ with col3:
     if st.button("Device Reader"):
         set_mode('Device Reader')
 
-# Create a result box
-result_box = st.empty()
-
 # DC Mode
 if st.session_state.mode == 'DC':
     st.header("DC Calculators")
 
     calc_type = st.selectbox("Choose a DC calculation", ["Ohm's Law", "Series/Parallel Resistor", "Voltage/Current Divider"])
     
+    # Result box
+    result_box = st.empty()
+
     # Ohm's Law Calculator
     if calc_type == "Ohm's Law":
         v = st.number_input("Voltage (V)", value=0.0)
@@ -158,10 +158,12 @@ if st.session_state.mode == 'DC':
                 res_list = [float(r) for r in resistances.split(',')]
                 if calculation_type == "Series":
                     series_res = calculate_series_resistance(res_list)
-                    result_box.success(f"Total Series Resistance: {series_res} Ω")
+                    if st.button("Calculate Series Resistance"):
+                        result_box.success(f"Total Series Resistance: {series_res} Ω")
                 elif calculation_type == "Parallel":
                     parallel_res = calculate_parallel_resistance(res_list)
-                    result_box.success(f"Total Parallel Resistance: {parallel_res} Ω")
+                    if st.button("Calculate Parallel Resistance"):
+                        result_box.success(f"Total Parallel Resistance: {parallel_res} Ω")
             except ValueError:
                 result_box.error("Please enter valid resistor values.")
 
@@ -194,6 +196,9 @@ elif st.session_state.mode == 'AC':
 
     calc_type = st.selectbox("Choose an AC calculation", ["Vrms", "RLC Impedance", "3-Phase Power"])
 
+    # Result box
+    result_box = st.empty()
+
     # Vrms Calculator
     if calc_type == "Vrms":
         peak_voltage = st.number_input("Peak Voltage (Vpeak)", value=0.0)
@@ -201,11 +206,11 @@ elif st.session_state.mode == 'AC':
 
         if st.button("Calculate RMS Voltage"):
             rms_voltage = calculate_rms_voltage(peak_voltage, waveform_type)
-            result_box.success(f"Calculated RMS Voltage for {waveform_type} wave: {rms_voltage} V")
+            result_box.success(f"RMS Voltage: {rms_voltage} V")
 
     # RLC Impedance Calculator
     elif calc_type == "RLC Impedance":
-        r = st.number_input("Resistance (R)", value=0.0)
+        r = st.number_input("Resistance (R in Ohm)", value=0.0)
         l = st.number_input("Inductance (L in Henry)", value=0.0)
         c = st.number_input("Capacitance (C in Farad)", value=0.0)
         frequency = st.number_input("Frequency (Hz)", value=0.0)
@@ -231,6 +236,9 @@ elif st.session_state.mode == 'Device Reader':
     
     st.subheader("Resistor Reader (4-Band and 5-Band)")
     resistor_type = st.selectbox("Select Resistor Type", options=["4-Band", "5-Band"])
+
+    # Result box
+    result_box = st.empty()
 
     if resistor_type == "4-Band":
         colors = st.text_input("Enter 4 colors (comma-separated, e.g., red, green, blue, gold)").split(",")
