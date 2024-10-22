@@ -69,7 +69,7 @@ def three_phase_power(v_phase, i_phase, power_factor, connection_type):
 st.title("Electrical Calculator")
 
 # Sidebar for navigation
-menu = ["DC", "AC"]
+menu = ["DC", "AC", "Device Reader"]
 choice = st.sidebar.selectbox("Select a calculator", menu)
 
 # DC Mode
@@ -164,6 +164,11 @@ elif choice == "AC":
         if st.button("Calculate 3-Phase Power"):
             total_power = three_phase_power(v_phase, i_phase, power_factor, connection_type)
             st.success(f"Calculated 3-Phase Power: {total_power} W")
+
+# Device Reader Mode (Placeholder)
+elif choice == "Device Reader":
+    st.header("Device Reader")
+    st.write("This feature will allow you to read values from various devices. (Functionality not yet implemented.)")
 
 # To run this Streamlit app, save the code in a file called app.py and run:
 # streamlit run app.py
