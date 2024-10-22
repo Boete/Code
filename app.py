@@ -22,14 +22,6 @@ if 'mode' not in st.session_state:
 def set_mode(mode):
     st.session_state.mode = mode
 
-# Initialize session state
-if 'mode' not in st.session_state:
-    st.session_state.mode = None
-
-# Set mode based on button clicks
-def set_mode(mode):
-    st.session_state.mode = mode
-
 # Function to calculate Ohm's law (Voltage, Current, Resistance)
 def calculate_ohms_law(v=None, i=None, r=None):
     if v is not None and i is not None:
@@ -130,21 +122,14 @@ col1, col2, col3 = st.columns(3)
 with col1:
     if st.button("DC"):
         set_mode('DC')
-    if st.button("DC"):
-        set_mode('DC')
 with col2:
-    if st.button("AC"):
-        set_mode('AC')
     if st.button("AC"):
         set_mode('AC')
 with col3:
     if st.button("Device Reader"):
         set_mode('Device Reader')
-    if st.button("Device Reader"):
-        set_mode('Device Reader')
 
 # DC Mode
-if st.session_state.mode == 'DC':
 if st.session_state.mode == 'DC':
     st.header("DC Calculators")
 
@@ -219,7 +204,6 @@ if st.session_state.mode == 'DC':
 
 # AC Mode
 elif st.session_state.mode == 'AC':
-elif st.session_state.mode == 'AC':
     st.header("AC Calculators")
 
     calc_type = st.selectbox("Choose an AC calculation", ["Vrms", "RLC Impedance", "3-Phase Power"])
@@ -239,9 +223,6 @@ elif st.session_state.mode == 'AC':
 
     # RLC Impedance Calculator
     elif calc_type == "RLC Impedance":
-        r = st.number_input("Resistance (R)", value=0.0)
-        l = st.number_input("Inductance (L in Henry)", value=0.0)
-        c = st.number_input("Capacitance (C in Farad)", value=0.0)
         r = st.number_input("Resistance (R)", value=0.0)
         l = st.number_input("Inductance (L in Henry)", value=0.0)
         c = st.number_input("Capacitance (C in Farad)", value=0.0)
@@ -271,7 +252,6 @@ elif st.session_state.mode == 'AC':
             st.text("Results")
 
 # Device Reader Mode with Resistor Reader
-elif st.session_state.mode == 'Device Reader':
 elif st.session_state.mode == 'Device Reader':
     st.header("Device Reader")
     
