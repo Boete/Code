@@ -14,6 +14,14 @@ def set_button_style():
     </style>
     """, unsafe_allow_html=True)
 
+# Initialize session state
+if 'mode' not in st.session_state:
+    st.session_state.mode = None
+
+# Set mode based on button clicks
+def set_mode(mode):
+    st.session_state.mode = mode
+
 # Function to calculate Ohm's law (Voltage, Current, Resistance)
 def calculate_ohms_law(v=None, i=None, r=None):
     if v is not None and i is not None:
@@ -112,14 +120,17 @@ set_button_style()
 # Buttons for navigation
 col1, col2, col3 = st.columns(3)
 with col1:
-    dc_mode = st.button("DC")
+    if st.button("DC"):
+        set_mode('DC')
 with col2:
-    ac_mode = st.button("AC")
+    if st.button("AC"):
+        set_mode('AC')
 with col3:
-    device_reader_mode = st.button("Device Reader")
+    if st.button("Device Reader"):
+        set_mode('Device Reader')
 
 # DC Mode
-if dc_mode:
+if st.session_state.mode == 'DC':
     st.header("DC Calculators")
 
     calc_type = st.selectbox("Choose a DC calculation", ["Ohm's Law", "Series/Parallel Resistor", "Voltage/Current Divider"])
@@ -175,7 +186,7 @@ if dc_mode:
                 st.success(f"Current through R2: {i2} A")
 
 # AC Mode
-if ac_mode:
+elif st.session_state.mode == 'AC':
     st.header("AC Calculators")
 
     calc_type = st.selectbox("Choose an AC calculation", ["Vrms", "RLC Impedance", "3-Phase Power"])
@@ -191,12 +202,12 @@ if ac_mode:
 
     # RLC Impedance Calculator
     elif calc_type == "RLC Impedance":
-        r = st.number_input("Resistance (R) in Ohms", value=0.0)
-        l = st.number_input("Inductance (L) in Henrys", value=0.0)
-        c = st.number_input("Capacitance (C) in Farads", value=0.0)
+        r = st.number_input("Resistance (R)", value=0.0)
+        l = st.number_input("Inductance (L in Henry)", value=0.0)
+        c = st.number_input("Capacitance (C in Farad)", value=0.0)
         frequency = st.number_input("Frequency (Hz)", value=0.0)
 
-        if st.button("Calculate Impedance"):
+        if st.button("Calculate RLC Impedance"):
             impedance = calculate_rlc_impedance(r, l, c, frequency)
             st.success(f"RLC Impedance: {impedance} Ω")
 
@@ -212,7 +223,7 @@ if ac_mode:
             st.success(f"Calculated 3-Phase Power: {total_power} W")
 
 # Device Reader Mode with Resistor Reader
-if device_reader_mode:
+elif st.session_state.mode == 'Device Reader':
     st.header("Device Reader")
     
     st.subheader("Resistor Reader (4-Band and 5-Band)")
@@ -235,6 +246,3 @@ if device_reader_mode:
                 st.success(f"5-Band Resistor Value: {resistance} Ω")
             except KeyError:
                 st.error("Invalid color entered. Please enter valid resistor colors.")
-
-# To run this Streamlit app, save the code in a file called app.py and run:
-# streamlit run app.py
