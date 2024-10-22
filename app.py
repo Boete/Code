@@ -169,21 +169,6 @@ elif choice == "AC":
 elif choice == "Device Reader":
     st.header("Device Reader")
     st.write("This feature will allow you to read values from various devices. (Functionality not yet implemented.)")
-        if st.button("Calculate Resistance"):
-            resistance = read_4_band_resistor([color1, color2, color3])
-            st.success(f"Calculated Resistance: {resistance} Ω")
-
-    elif device_type == "5-Band Resistor":
-        st.subheader("Enter Colors for 5-Band Resistor")
-        color1 = st.selectbox("Color 1", options=color_options, key='color1')
-        color2 = st.selectbox("Color 2", options=color_options, key='color2')
-        color3 = st.selectbox("Color 3", options=color_options, key='color3')
-        color4 = st.selectbox("Multiplier Color", options=color_options, key='color4')
-
-        if st.button("Calculate Resistance"):
-            resistance = read_5_band_resistor([color1, color2, color3, color4])
-            st.success(f"Calculated Resistance: {resistance} Ω")
- #gjkyhgj
 
 # To run this Streamlit app, save the code in a file called app.py and run:
 # streamlit run app.py
