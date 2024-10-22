@@ -65,6 +65,31 @@ def three_phase_power(v_phase, i_phase, power_factor, connection_type):
         return 3 * v_phase * i_phase * power_factor
     return 0
 
+# Function to read 4-band resistor
+def read_4_band_resistor(colors):
+    color_codes = {
+        "black": 0, "brown": 1, "red": 2, "orange": 3, "yellow": 4,
+        "green": 5, "blue": 6, "violet": 7, "gray": 8, "white": 9
+    }
+    first_digit = color_codes[colors[0].lower()]
+    second_digit = color_codes[colors[1].lower()]
+    multiplier = 10 ** color_codes[colors[2].lower()]
+    resistance = (first_digit * 10 + second_digit) * multiplier
+    return resistance
+
+# Function to read 5-band resistor
+def read_5_band_resistor(colors):
+    color_codes = {
+        "black": 0, "brown": 1, "red": 2, "orange": 3, "yellow": 4,
+        "green": 5, "blue": 6, "violet": 7, "gray": 8, "white": 9
+    }
+    first_digit = color_codes[colors[0].lower()]
+    second_digit = color_codes[colors[1].lower()]
+    third_digit = color_codes[colors[2].lower()]
+    multiplier = 10 ** color_codes[colors[3].lower()]
+    resistance = (first_digit * 100 + second_digit * 10 + third_digit) * multiplier
+    return resistance
+
 # Streamlit App
 st.title("Electrical Calculator")
 
@@ -165,12 +190,30 @@ elif choice == "AC":
             total_power = three_phase_power(v_phase, i_phase, power_factor, connection_type)
             st.success(f"Calculated 3-Phase Power: {total_power} W")
 
-# Device Reader Mode (Placeholder)
+# Device Reader Mode with Resistor Reader
 elif choice == "Device Reader":
     st.header("Device Reader")
-    st.write("This feature will allow you to read values from various devices. (Functionality not yet implemented.)")
+    
+    st.subheader("Resistor Reader (4-Band and 5-Band)")
+    resistor_type = st.selectbox("Select Resistor Type", options=["4-Band", "5-Band"])
+
+    if resistor_type == "4-Band":
+        colors = st.text_input("Enter 4 colors (comma-separated, e.g., red, green, blue, gold)").split(",")
+        if len(colors) == 4 and st.button("Calculate Resistance"):
+            try:
+                resistance = read_4_band_resistor(colors)
+                st.success(f"4-Band Resistor Value: {resistance} Ω")
+            except KeyError:
+                st.error("Invalid color entered. Please enter valid resistor colors.")
+    
+    elif resistor_type == "5-Band":
+        colors = st.text_input("Enter 5 colors (comma-separated, e.g., red, green, blue, orange, gold)").split(",")
+        if len(colors) == 5 and st.button("Calculate Resistance"):
+            try:
+                resistance = read_5_band_resistor(colors)
+                st.success(f"5-Band Resistor Value: {resistance} Ω")
+            except KeyError:
+                st.error("Invalid color entered. Please enter valid resistor colors.")
 
 # To run this Streamlit app, save the code in a file called app.py and run:
 # streamlit run app.py
-#todaaa
-#hhhhhh
