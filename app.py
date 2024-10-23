@@ -17,10 +17,13 @@ def set_button_style():
 # Initialize session state
 if 'mode' not in st.session_state:
     st.session_state.mode = None
+if 'result_text' not in st.session_state:
+    st.session_state.result_text = ""  # Initialize result text in session state
 
 # Set mode based on button clicks
 def set_mode(mode):
     st.session_state.mode = mode
+    st.session_state.result_text = ""  # Clear result when mode is changed
 
 # Function to calculate Ohm's law (Voltage, Current, Resistance)
 def calculate_ohms_law(v=None, i=None, r=None):
@@ -110,45 +113,7 @@ def read_5_band_resistor(colors):
     multiplier = 10 ** color_codes[colors[3].lower()]
     resistance = (first_digit * 100 + second_digit * 10 + third_digit) * multiplier
     return resistance
-# Function to get user location
-def get_user_location():
-    # HTML and JavaScript code to get user location
-    location_js = """
-    <script>
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-            document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
-        }
-    }
 
-    function showPosition(position) {
-        var lat = position.coords.latitude;
-        var lon = position.coords.longitude;
-        // Send the location to Streamlit via a callback
-        const message = { lat: lat, lon: lon };
-        window.parent.document.getElementById('lat_lon').value = JSON.stringify(message);
-        document.getElementById("location").innerHTML = "Location retrieved.";
-    }
-    </script>
-    <button onclick="getLocation()">Get Location</button>
-    <div id="location"></div>
-    """
-    return location_js
-
-# Streamlit App
-st.title("User Location Collector")
-
-# Display the HTML for getting user location
-st.markdown(get_user_location(), unsafe_allow_html=True)
-
-# Hidden input to hold the location data
-location_data = st.text_input("Location Data", "", key='lat_lon')
-
-if location_data:
-    location = st.session_state.lat_lon
-    st.success(f"User's Location: {location}")
 # Streamlit App
 st.title("Electrical Calculator")
 
@@ -172,9 +137,6 @@ if st.session_state.mode == 'DC':
     st.header("DC Calculators")
 
     calc_type = st.selectbox("Choose a DC calculation", ["Ohm's Law", "Series/Parallel Resistor", "Voltage/Current Divider"])
-    
-    # Result box
-    result_box = st.empty()
 
     # Ohm's Law Calculator
     if calc_type == "Ohm's Law":
@@ -184,26 +146,30 @@ if st.session_state.mode == 'DC':
 
         if st.button("Calculate Ohm's Law"):
             v, i, r = calculate_ohms_law(v if v > 0 else None, i if i > 0 else None, r if r > 0 else None)
-            result_box.success(f"Calculated Values: Voltage = {v} V, Current = {i} A, Resistance = {r} Ω")
+            st.session_state.result_text = f"Calculated Values: Voltage = {v} V, Current = {i} A, Resistance = {r} Ω"
+        # Result Box as a text box at the bottom
+        st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
 
     # Series and Parallel Resistor Calculator
     elif calc_type == "Series/Parallel Resistor":
         calculation_type = st.selectbox("Select calculation type", ["Series", "Parallel"])
         resistances = st.text_input("Enter resistances (comma-separated, e.g., 10, 20, 30)")
-        
+
         if resistances:
             try:
                 res_list = [float(r) for r in resistances.split(',')]
                 if calculation_type == "Series":
                     series_res = calculate_series_resistance(res_list)
                     if st.button("Calculate Series Resistance"):
-                        result_box.success(f"Total Series Resistance: {series_res} Ω")
+                        st.session_state.result_text = f"Total Series Resistance: {series_res} Ω"
                 elif calculation_type == "Parallel":
                     parallel_res = calculate_parallel_resistance(res_list)
                     if st.button("Calculate Parallel Resistance"):
-                        result_box.success(f"Total Parallel Resistance: {parallel_res} Ω")
+                        st.session_state.result_text = f"Total Parallel Resistance: {parallel_res} Ω"
+                # Result Box as a text box at the bottom
+                st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
             except ValueError:
-                result_box.error("Please enter valid resistor values.")
+                st.session_state.result_text = "Please enter valid resistor values."
 
     # Voltage/Current Divider Calculator
     elif calc_type == "Voltage/Current Divider":
@@ -216,7 +182,7 @@ if st.session_state.mode == 'DC':
 
             if st.button("Calculate Voltage Divider"):
                 vout = voltage_divider(vin, r1, r2)
-                result_box.success(f"Output Voltage (Vout): {vout} V")
+                st.session_state.result_text = f"Output Voltage (Vout): {vout} V"
 
         elif divider_type == "Current Divider":
             itotal = st.number_input("Enter total current (Itotal)", value=0.0)
@@ -225,17 +191,15 @@ if st.session_state.mode == 'DC':
 
             if st.button("Calculate Current Divider"):
                 i1, i2 = current_divider(itotal, r1, r2)
-                result_box.success(f"Current through R1: {i1} A")
-                result_box.success(f"Current through R2: {i2} A")
+                st.session_state.result_text = f"Current through R1: {i1} A, Current through R2: {i2} A"
+        # Result Box as a text box at the bottom
+        st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
 
 # AC Mode
 elif st.session_state.mode == 'AC':
     st.header("AC Calculators")
 
     calc_type = st.selectbox("Choose an AC calculation", ["Vrms", "RLC Impedance", "3-Phase Power"])
-
-    # Result box
-    result_box = st.empty()
 
     # Vrms Calculator
     if calc_type == "Vrms":
@@ -244,54 +208,60 @@ elif st.session_state.mode == 'AC':
 
         if st.button("Calculate RMS Voltage"):
             rms_voltage = calculate_rms_voltage(peak_voltage, waveform_type)
-            result_box.success(f"RMS Voltage: {rms_voltage} V")
+            st.session_state.result_text = f"RMS Voltage: {rms_voltage} V"
+        # Result Box as a text box at the bottom
+        st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
 
     # RLC Impedance Calculator
     elif calc_type == "RLC Impedance":
-        r = st.number_input("Resistance (R in Ohm)", value=0.0)
+        r = st.number_input("Resistance (R in Ohms)", value=0.0)
         l = st.number_input("Inductance (L in Henry)", value=0.0)
         c = st.number_input("Capacitance (C in Farad)", value=0.0)
         frequency = st.number_input("Frequency (Hz)", value=0.0)
 
         if st.button("Calculate RLC Impedance"):
             impedance = calculate_rlc_impedance(r, l, c, frequency)
-            result_box.success(f"RLC Impedance: {impedance} Ω")
+            st.session_state.result_text = f"Impedance: {impedance} Ω"
+        # Result Box as a text box at the bottom
+        st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
 
     # 3-Phase Power Calculator
     elif calc_type == "3-Phase Power":
         v_phase = st.number_input("Phase Voltage (V)", value=0.0)
         i_phase = st.number_input("Phase Current (I)", value=0.0)
-        power_factor = st.number_input("Power Factor (0-1)", value=1.0)
+        power_factor = st.number_input("Power Factor (pf)", value=1.0)
         connection_type = st.selectbox("Connection Type", options=["Y", "Delta"])
 
         if st.button("Calculate 3-Phase Power"):
-            total_power = three_phase_power(v_phase, i_phase, power_factor, connection_type)
-            result_box.success(f"Calculated 3-Phase Power: {total_power} W")
-
-# Device Reader Mode with Resistor Reader
+            power = three_phase_power(v_phase, i_phase, power_factor, connection_type)
+            st.session_state.result_text = f"3-Phase Power: {power} W"
+        # Result Box as a text box at the bottom
+        st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
+# Device Reader Mode
 elif st.session_state.mode == 'Device Reader':
     st.header("Device Reader")
-    
-    st.subheader("Resistor Reader (4-Band and 5-Band)")
-    resistor_type = st.selectbox("Select Resistor Type", options=["4-Band", "5-Band"])
 
-    # Result box
-    result_box = st.empty()
+    reader_type = st.selectbox("Choose a device reader", ["4-Band Resistor", "5-Band Resistor"])
 
-    if resistor_type == "4-Band":
-        colors = st.text_input("Enter 4 colors (comma-separated, e.g., red, green, blue, gold)").split(",")
-        if len(colors) == 4 and st.button("Calculate Resistance"):
-            try:
-                resistance = read_4_band_resistor(colors)
-                result_box.success(f"4-Band Resistor Value: {resistance} Ω")
-            except KeyError:
-                result_box.error("Invalid color entered. Please enter valid resistor colors.")
-    
-    elif resistor_type == "5-Band":
-        colors = st.text_input("Enter 5 colors (comma-separated, e.g., red, green, blue, orange, gold)").split(",")
-        if len(colors) == 5 and st.button("Calculate Resistance"):
-            try:
-                resistance = read_5_band_resistor(colors)
-                result_box.success(f"5-Band Resistor Value: {resistance} Ω")
-            except KeyError:
-                result_box.error("Invalid color entered. Please enter valid resistor colors.")
+    # 4-Band Resistor Reader
+    if reader_type == "4-Band Resistor":
+        colors = [st.selectbox(f"Choose color for {band}", ["black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "gray", "white"]) for band in ["Band 1", "Band 2", "Multiplier"]]
+
+        if st.button("Read 4-Band Resistor"):
+            resistance = read_4_band_resistor(colors)
+            st.session_state.result_text = f"4-Band Resistor Value: {resistance} Ω"
+        # Result Box as a text box at the bottom
+        st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
+
+    # 5-Band Resistor Reader
+    elif reader_type == "5-Band Resistor":
+        colors = [st.selectbox(f"Choose color for {band}", ["black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "gray", "white"]) for band in ["Band 1", "Band 2", "Band 3", "Multiplier"]]
+
+        if st.button("Read 5-Band Resistor"):
+            resistance = read_5_band_resistor(colors)
+            st.session_state.result_text = f"5-Band Resistor Value: {resistance} Ω"
+        # Result Box as a text box at the bottom
+        st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
+
+# Result Box as a text box at the bottom
+# st.text_area("Results", value=st.session_state.result_text, height=100, key="result_box", disabled=True)
